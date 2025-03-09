@@ -8,9 +8,12 @@ let boxHeight = 2500;
 let seed;
 
 function setup() {
-  // seed = floor(random(100000)); // Get a random integer seed
+  seed = floor(random(100000)); // Get a random integer seed
 
-  seed = 58124;
+  // seed = 58124;
+  // seed - 81790;
+  // 15968
+  // 23135
 
   // Set the random seed
   randomSeed(seed);
@@ -65,8 +68,8 @@ function draw() {
 
     const c = capsule(capLength, capFat, variations[0]);
 
-    x = random(200, 2000);
-    y = random(200, 2000);
+    x = random(150, 2000);
+    y = random(150, 2000);
 
     translate(x, y);
     // rotate(45);
@@ -76,14 +79,27 @@ function draw() {
 
   for (let c = 0; c < 5; c++) {
     push();
-
     const capLength = random(200, 400);
+    const capFat = random(20, 100);
+    const c = capsule(capLength, capFat, variations[3]);
+    x = random(200, 2000);
+    y = random(200, 2000);
+    translate(x, y);
+    // rotate(45);
+    image(c.img, 0, 0);
+    pop();
+  }
+
+  for (let c = 0; c < 5; c++) {
+    push();
+
+    const capLength = random(400, 800);
     const capFat = random(20, 100);
 
     const c = capsule(capLength, capFat, variations[3]);
 
     x = random(200, 2000);
-    y = random(200, 2000);
+    y = random(2000, 2200);
 
     translate(x, y);
     // rotate(45);
@@ -126,12 +142,7 @@ function createFrame(frameWidth, frameHeight) {
 
   frameGraphics.push();
   frameGraphics.fill(variations[2]);
-  frameGraphics.rect(
-    frameWidth / 2,
-    frameHeight / 2,
-    frameWidth ,
-    frameHeight 
-  );
+  frameGraphics.rect(frameWidth / 2, frameHeight / 2, frameWidth, frameHeight);
   frameGraphics.pop();
 
   return frameGraphics;
@@ -145,6 +156,11 @@ function createMainBlock(mainBlockWidth, mainBlockHeight) {
   mainBlockGraphics.fill(baseColor);
   mainBlockGraphics.rect(mainBlockWidth / 2, mainBlockHeight / 2, 2200, 2200);
   mainBlockGraphics.pop();
+
+  for (let x = 200; x <= 2300; x += 10) {
+    mainBlockGraphics.fill(variations[floor(random(2))]);
+    mainBlockGraphics.rect(x, mainBlockHeight / 2, random(4, 8), 300);
+  }
 
   return mainBlockGraphics;
 }
