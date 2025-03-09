@@ -1,211 +1,150 @@
-//////////////////////////////////////////////////
-// Object for creation and real-time resize of canvas
-// Good function to create canvas and resize functions. I use this in all examples.
-const C = {
-  loaded: false,
-  prop() {
-    return this.height / this.width;
-  },
-  isLandscape() {
-    return window.innerHeight <= window.innerWidth * this.prop();
-  },
-  resize() {
-    if (this.isLandscape()) {
-      console.log("isLandscape");
-      document.getElementById(this.css).style.height = "100%";
-      document.getElementById(this.css).style.removeProperty("width");
-    } else {
-      document.getElementById(this.css).style.removeProperty("height");
-      document.getElementById(this.css).style.width = "100%";
-    }
-  },
-  setSize(w, h, p, css) {
-    (this.width = w), (this.height = h), (this.pD = p), (this.css = css);
-  },
-  createCanvas() {
-    (this.main = createCanvas(this.width, this.height, WEBGL)),
-      pixelDensity(this.pD),
-      this.main.id(this.css),
-      this.resize();
-  },
-};
-C.setSize(1000, 1000, 2, "mainCanvas");
+let baseColor;
+let variations = [];
 
-function windowResized() {
-  C.resize();
-}
+let boxWidth = 2500;
+let boxHeight = 2500;
 
-const palettes = [
-  ["#ff9a8b", "#ff6a88", "#ff99ac", "#ffb6c1", "#ffcad4"], // sunset: 0
-  ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"], // ocean: 1
-  ["#ff00ff", "#ff8800", "#ffcc00", "#00ffcc", "#8800ff"], // neon: 2
-  ["#a8dadc", "#f1faee", "#457b9d", "#1d3557", "#e63946"], // pastel: 3
-  ["#2b2d42", "#8d99ae", "#edf2f4", "#ef233c", "#d90429"], // forest: 4
-  ["#ffbe0b", "#fb5607", "#ff006e", "#8338ec", "#3a86ff"], // retro: 5
-  ["#F8FAFC", "#D9EAFD", "#BCCCDC", "#9AA6B2", "#F14A00"], // chris: 6
-  ["#9CFA08", "#9CFA08", "#9CFA08", "#9CFA08", "#9CFA08"], // greens: 7
-];
-
-let line = 0;
+// Generate a random seed
+let seed;
 
 function setup() {
-  C.createCanvas();
+  // seed = floor(random(100000)); // Get a random integer seed
+
+  seed = 58124;
+
+  // Set the random seed
+  randomSeed(seed);
+  noiseSeed(seed);
+
+  console.log("Random Seed:", seed);
+
+  // createCanvas(2481, 3507);
+  createCanvas(2500, 2500);
+
   angleMode(DEGREES);
-  brush.scale(1.3);
-  // for (let i = 0; i < 150; i++) seeds.push(random());
-  // background("#fffceb");
-  background("#F78A11");
-  // background("#ff006e");
-  frameRate(10);
-}
 
-function getColour() {
-  // return  random([
-  //   "#ff7b00",
-  //   "#ff8800",
-  //   "#ff9500",
-  //   "#ffa200",
-  //   "#ffaa00",
-  //   "#ffb700",
-  //   "#ffc300",
-  //   "#ffd000",
-  //   "#ffdd00",
-  //   "#ffea00",
-  // ]);
+  colorMode(HSB, 360, 100, 100, 100); // Use HSB for easy manipulation
+  baseColor = color(30, 100, 100); // Approximate HSB of (255,128,0) in RGB
 
-  return random([
-    // "#ff579f", // pink
-    "#007f5f",
-    "#2b9348",
-    "#55a630",
-    "#80b918",
-    "#aacc00",
-    "#bfd200",
-    "#d4d700",
-    "#dddf00",
-    "#eeef20",
-    "#ffff3f",
-  ]);
-}
-
-function flowLine(x, y, len, deg) {
-
-  // if(x<120 && x>-120 && y>-120 && y < 120) {
-  //   return;
-  // }
-
-  brush.flowLine(x, y, len, deg);
-  line++;
-  console.log(line);
-  if (line === 15000) {
-    noLoop();
+  for (let i = 0; i < 5; i++) {
+    let hueShift = (hue(baseColor) + random(-10, 10)) % 360;
+    let satShift = constrain(saturation(baseColor) + random(-30, 30), 0, 100);
+    let brightShift = constrain(
+      brightness(baseColor) + random(-30, 30),
+      0,
+      100
+    );
+    let alphaShift = random(50, 100);
+    variations.push(color(hueShift, satShift, brightShift, alphaShift));
   }
+
+  background(255);
+  noLoop();
 }
 
 function draw() {
-  brush.field("seabed");
-  biggest();
-  medium();
-  smallest();
+  noStroke();
+
+  const frame = createFrame(2500, 2500);
+  image(frame, 0, 0);
+
+  const mainBlock = createMainBlock(2500, 2500);
+  image(mainBlock, 0, 0);
+
+  let x = 500;
+  let y = boxHeight / 2;
+  console.log(y);
+  console.log(pixelDensity());
+  imageMode(CENTER);
+
+  for (let c = 0; c < 25; c++) {
+    push();
+
+    const capLength = random(200, 400);
+    const capFat = random(20, 100);
+
+    const c = capsule(capLength, capFat, variations[0]);
+
+    x = random(200, 2000);
+    y = random(200, 2000);
+
+    translate(x, y);
+    // rotate(45);
+    image(c.img, 0, 0);
+    pop();
+  }
+
+  for (let c = 0; c < 5; c++) {
+    push();
+
+    const capLength = random(200, 400);
+    const capFat = random(20, 100);
+
+    const c = capsule(capLength, capFat, variations[3]);
+
+    x = random(200, 2000);
+    y = random(200, 2000);
+
+    translate(x, y);
+    // rotate(45);
+    image(c.img, 0, 0);
+    pop();
+  }
+
+  push();
 }
 
-function biggest() {
-  rows = [-150, -50, 50, 150];
-  cols = [-150, -50, 50, 150];
-  wobble = 10;
-  minLen = 50;
-  maxLen = 70;
+// define the capsule function
+function capsule(w, h, c) {
+  const capsuleCanvas = createGraphics(w, h);
+  capsuleCanvas.noStroke();
+  // capsuleCanvas.background(128, 128, 128); // match the background color of the main canvas
 
-  brushes = [
-    "marker",
-    // "spray",
-    // "charcoal",
-    // "HB",
-    // "2B",
-    "cpencil",
-    // "2H",
-    "rotring",
-  ];
+  // calculate the radius of the capsule
+  let r = h / 2;
 
-  // big circles
-  for (let y = 0; y < rows.length; y++) {
-    for (let x = 0; x < cols.length; x++) {
-      brush.set(random(brushes), getColour(), random(0.7, 1.6));
+  capsuleCanvas.fill(c); // set the fill color to white
 
+  // draw the left and right circles of the capsule
+  capsuleCanvas.ellipse(r, r, r * 2, r * 2);
+  capsuleCanvas.ellipse(w - r, r, r * 2, r * 2);
+  // draw the rectangle in the middle of the capsule
+  capsuleCanvas.rect(r, 0, w - 2 * r, h);
 
+  let circleArea = PI * h;
+  let rectArea = h * (w - h);
 
-
-      flowLine(
-        cols[x] + random(-wobble, wobble),
-        rows[y] + random(-wobble, wobble),
-        random(minLen, maxLen),
-        random(360)
-      );
-    }
-  }
+  return {
+    img: capsuleCanvas,
+    area: circleArea + rectArea,
+  };
 }
 
-function medium() {
-  let brushes = [
-    "marker",
-    "spray",
-    // "charcoal",
-    // "HB",
-    // "2B",
-    // "cpencil",
-    // "2H",
-    "rotring",
-  ];
+function createFrame(frameWidth, frameHeight) {
+  const frameGraphics = createGraphics(frameWidth, frameHeight);
+  frameGraphics.rectMode(CENTER);
 
-  let rows = [-100, 0, 100];
-  let cols = [-100, 0, 100];
-  let wobble = 40;
-  let minLen = 90;
-  let maxLen = 110;
+  frameGraphics.push();
+  frameGraphics.fill(variations[2]);
+  frameGraphics.rect(
+    frameWidth / 2,
+    frameHeight / 2,
+    frameWidth ,
+    frameHeight 
+  );
+  frameGraphics.pop();
 
-  // small circles
-  for (let y = 0; y < rows.length; y++) {
-    for (let x = 0; x < cols.length; x++) {
-      brush.set(random(brushes), getColour(), random(0.7, 1.6));
-      flowLine(
-        cols[x] + random(-wobble, wobble),
-        rows[y] + random(-wobble, wobble),
-        random(minLen, maxLen),
-        random(360)
-      );
-    }
-  }
+  return frameGraphics;
 }
 
+function createMainBlock(mainBlockWidth, mainBlockHeight) {
+  const mainBlockGraphics = createGraphics(mainBlockWidth, mainBlockHeight);
+  mainBlockGraphics.rectMode(CENTER);
 
-function smallest() {
-  rows = [-175, -125, -75, -25, 25, 75, 125, 175];
-  cols = [-175, -125, -75, -25, 25, 75, 125, 175];
-  wobble = 10;
-  minLen = 15;
-  maxLen = 45;
+  mainBlockGraphics.push();
+  mainBlockGraphics.fill(baseColor);
+  mainBlockGraphics.rect(mainBlockWidth / 2, mainBlockHeight / 2, 2200, 2200);
+  mainBlockGraphics.pop();
 
-  brushes = [
-    "marker",
-    // "spray",
-    // "charcoal",
-    // "HB",
-    // "2B",
-    "cpencil",
-    // "2H",
-    "rotring",
-  ];
-
-  // big circles
-  for (let y = 0; y < rows.length; y++) {
-    for (let x = 0; x < cols.length; x++) {
-      brush.set(random(brushes), getColour(), random(0.7, 1.6));
-      flowLine(
-        cols[x] + random(-wobble, wobble),
-        rows[y] + random(-wobble, wobble),
-        random(minLen, maxLen),
-        random(360)
-      );
-    }
-  }
+  return mainBlockGraphics;
 }
