@@ -10,14 +10,18 @@ let seed;
 function setup() {
   seed = floor(random(100000)); // Get a random integer seed
 
-  // seed = 58124;
-  // seed - 81790;
+  // 58124;
+  // 81790;
   // 15968
   // 23135
   // 89674
   // 47239
   // 55587
-  // 67031
+  // 67031#
+  // 83524
+  // 47454
+  // 18157
+  // 33285
 
   // Set the random seed
   randomSeed(seed);
@@ -34,9 +38,12 @@ function setup() {
   baseColor = color(30, 100, 100); // Approximate HSB of (255,128,0) in RGB
 
   setupColourVariations(baseColor);
-
   background(255);
   noLoop();
+
+  // imageMode(CENTER);
+  // background(255);
+  // redraw();
 }
 
 function setupColourVariations(baseColor) {
@@ -66,9 +73,8 @@ function draw() {
   let y = boxHeight / 2;
   console.log(y);
   console.log(pixelDensity());
-  imageMode(CENTER);
 
-  for (let c = 0; c < 10; c++) {
+  for (let c = 0; c < 5; c++) {
     push();
     const capLength = random(200, 400);
     const capFat = random(20, 150);
@@ -76,7 +82,7 @@ function draw() {
     x = random(250, 2000);
     y = random(150, 2400);
     translate(x, y);
-    rotate(45);
+    // rotate(45);
     image(c.img, 0, 0);
     pop();
   }
@@ -89,12 +95,12 @@ function draw() {
     x = random(200, 2000);
     y = random(200, 2000);
     translate(x, y);
-    rotate(45);
+    // rotate(45);
     image(c.img, 0, 0);
     pop();
   }
 
-  for (let c = 0; c < 3; c++) {
+  for (let c = 0; c < 5; c++) {
     push();
     const capLength = random(400, 800);
     const capFat = random(20, 100);
@@ -157,11 +163,10 @@ function createFrame(frameWidth, frameHeight) {
   frameGraphics.fill(variations[2]);
   frameGraphics.rect(frameWidth / 2, frameHeight / 2, frameWidth, frameHeight);
 
-  for (var i = 0; i < frameHeight; i += 10) {
-    frameGraphics.fill(variations[4]);
-
-    frameGraphics.rect(frameWidth / 2, i, frameWidth, random(3, 7));
-  }
+  // for (var i = 0; i < frameHeight; i += 10) {
+  //   frameGraphics.fill(variations[4]);
+  //   frameGraphics.rect(frameWidth / 2, i, frameWidth, random(3, 7));
+  // }
 
   frameGraphics.filter(BLUR, 5);
   frameGraphics.pop();
@@ -172,16 +177,47 @@ function createFrame(frameWidth, frameHeight) {
 function createMainBlock(mainBlockWidth, mainBlockHeight) {
   const mainBlockGraphics = createGraphics(mainBlockWidth, mainBlockHeight);
   mainBlockGraphics.rectMode(CENTER);
+  mainBlockGraphics.noStroke();
 
   mainBlockGraphics.push();
   mainBlockGraphics.fill(baseColor);
   mainBlockGraphics.rect(mainBlockWidth / 2, mainBlockHeight / 2, 2200, 2200);
   mainBlockGraphics.pop();
 
-  for (let x = 200; x <= 2300; x += 10) {
+  mainBlockGraphics.push();
+  mainBlockGraphics.noStroke();
+  let y = mainBlockHeight / 2 + random(-100, 100);
+  // "barcode"
+  for (let x = 200; x <= 2300; x += 6) {
     mainBlockGraphics.fill(variations[floor(random(2))]);
-    mainBlockGraphics.rect(x, mainBlockHeight / 2, random(4, 8), 300);
+    mainBlockGraphics.rect(
+      x,
+      y + random(-10, 10),
+      random(2, 5),
+      random(500, 800)
+    );
   }
+  mainBlockGraphics.pop();
+  mainBlockGraphics.filter(BLUR, 1);
+
+  mainBlockGraphics.push();
+  mainBlockGraphics.noStroke();
+  for (let thinBarCodes = 0; thinBarCodes < 15; thinBarCodes++) {
+    y = mainBlockHeight / 2 + random(-10, 20) * 10;
+    // "barcode"
+    for (let x = 200; x <= 2300; x += 6) {
+      mainBlockGraphics.fill(variations[floor(random(2))]);
+      mainBlockGraphics.rect(
+        x,
+        y + random(-10, 10),
+        random(2, 5),
+        random(20, 30)
+      );
+    }
+  }
+  mainBlockGraphics.pop();
+
+  mainBlockGraphics.filter(BLUR, 1);
 
   return mainBlockGraphics;
 }
